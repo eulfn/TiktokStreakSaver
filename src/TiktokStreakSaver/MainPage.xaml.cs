@@ -286,12 +286,13 @@ public partial class MainPage : ContentPage
 
     private View CreateFriendView(FriendConfig friend)
     {
+        var isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
         var card = new Border
         {
             Style = Application.Current?.Resources["SectionCard"] as Style,
             Padding = new Thickness(12, 8),
             Margin = new Thickness(0, 0, 0, 2),
-            BackgroundColor = Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#222222" : "#F9F9F9"),
+            BackgroundColor = Color.FromArgb(isDark ? "#222222" : "#F9F9F9"),
             StrokeThickness = 0.5
         };
 
@@ -430,12 +431,13 @@ public partial class MainPage : ContentPage
         var successCount = run.FriendResults.Count(r => r.Success);
         var totalCount = run.FriendResults.Count;
         var statusColor = run.Success ? Color.FromArgb("#4CAF50") : Color.FromArgb("#F44336");
+        var isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
 
         var card = new Border
         {
             Padding = new Thickness(12, 10),
-            BackgroundColor = Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#222222" : "#F9F9F9"),
-            Stroke = Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#333333" : "#E5E5E5"),
+            BackgroundColor = Color.FromArgb(isDark ? "#222222" : "#F9F9F9"),
+            Stroke = Color.FromArgb(isDark ? "#333333" : "#E5E5E5"),
             StrokeThickness = 1,
             StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(8) }
         };

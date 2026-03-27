@@ -47,7 +47,6 @@
                         <Grid>
                             <Button x:Name="LoginButton"
                                     Text="Connecting Account"
-                                    Style="{StaticResource Button}"
                                     BackgroundColor="{StaticResource Primary}"
                                     TextColor="White"
                                     FontAttributes="Bold"
