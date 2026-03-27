@@ -2,18 +2,17 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TiktokStreakSaver.MainPage"
-             Title="TikTok Streak Saver"
-             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}">
+             Title="TikTok Streak Saver">
 
     <Grid RowDefinitions="*, Auto">
         <!-- Main Scrollable Content -->
-        <ScrollView Grid.Row="0">
-            <VerticalStackLayout Padding="24" Spacing="24">
+        <ScrollView Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}">
+            <VerticalStackLayout Padding="20" Spacing="24">
                 
-                <!-- 1. Header -->
-                <VerticalStackLayout Spacing="6">
+                <!-- Header -->
+                <VerticalStackLayout Spacing="4" Margin="4,0">
                     <Label Text="Streak Saver" 
-                           FontSize="32" 
+                           FontSize="28" 
                            FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
                     <Label x:Name="StatusLabel" 
@@ -23,132 +22,145 @@
                            TextColor="{StaticResource Gray500}"/>
                 </VerticalStackLayout>
 
-                <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-
-                <!-- 2. Status Stats -->
-                <VerticalStackLayout Spacing="16">
-                    <Label Text="Activity Configuration" 
-                           FontSize="18" 
-                           FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
-                    
-                    <Grid RowDefinitions="Auto" ColumnDefinitions="*, *" ColumnSpacing="16">
-                        <VerticalStackLayout Grid.Column="0" Spacing="4">
-                            <Label Text="Last Run:" FontSize="12" TextColor="{StaticResource Gray500}"/>
-                            <Label x:Name="LastRunLabel" Text="Never" FontSize="14" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
-                        </VerticalStackLayout>
-                        
-                        <VerticalStackLayout Grid.Column="1" Spacing="4">
-                            <Label Text="Next Run:" FontSize="12" TextColor="{StaticResource Gray500}"/>
-                            <Label x:Name="NextRunLabel" Text="Not scheduled" FontSize="14" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
-                        </VerticalStackLayout>
-                    </Grid>
-                </VerticalStackLayout>
-
-                <!-- 3. TikTok Login -->
-                <Grid>
-                    <Button x:Name="LoginButton"
-                            Text="Login to TikTok"
-                            BackgroundColor="{StaticResource Primary}"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            CornerRadius="8"
-                            HeightRequest="50"
-                            Clicked="OnLoginClicked"/>
-                    
-                    <HorizontalStackLayout x:Name="SessionCheckingIndicator" 
-                                           IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
-                        <ActivityIndicator IsRunning="True" Color="White" HeightRequest="20" WidthRequest="20"/>
-                        <Label Text="Checking session..." TextColor="White" VerticalOptions="Center"/>
-                    </HorizontalStackLayout>
-                </Grid>
-                
-                <WebView x:Name="SessionCheckWebView" HeightRequest="0" WidthRequest="0" IsVisible="False" Navigated="OnSessionCheckNavigated"/>
-
-                <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-
-                <!-- 4. Message Configuration -->
-                <VerticalStackLayout Spacing="16">
-                    <Label Text="Message Template" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
-                    <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
-                        <Editor x:Name="MessageEditor" Placeholder="Enter your streak message..." HeightRequest="80" Margin="8" TextChanged="OnMessageChanged"/>
-                    </Border>
-                </VerticalStackLayout>
-
-                <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-
-                <!-- 5. Friends List -->
-                <VerticalStackLayout Spacing="16">
-                    <Grid ColumnDefinitions="*, Auto">
-                        <Label Text="Friends List" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
-                        <Button Grid.Column="1" Text="Add Friend" Style="{StaticResource TextButton}" Clicked="OnAddFriendClicked"/>
-                    </Grid>
-                    
-                    <SearchBar x:Name="FriendsSearchBar" Placeholder="Search friends..." TextChanged="OnSearchTextChanged" Margin="0,-8,0,0" />
-                    
-                    <!-- Add Friend Panel -->
-                    <VerticalStackLayout x:Name="AddFriendPanel" IsVisible="False" Spacing="12">
-                        <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
-                            <Entry x:Name="NewFriendUsernameEntry" Placeholder="TikTok username (without @)" Margin="8,4"/>
-                        </Border>
-                        <Border Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
-                            <Entry x:Name="NewFriendDisplayNameEntry" Placeholder="Display name (optional)" Margin="8,4"/>
-                        </Border>
-                        <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
-                            <Button Text="Cancel" Style="{StaticResource TextButton}" TextColor="{StaticResource Gray500}" HeightRequest="44" Clicked="OnCancelAddFriend"/>
-                            <Button Grid.Column="1" Text="Save" BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="8" HeightRequest="44" Clicked="OnSaveFriend"/>
+                <!-- Status Stats Card -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="System Status" Style="{StaticResource SectionLabel}"/>
+                        <Grid ColumnDefinitions="*, *" ColumnSpacing="16">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="Last Automation" Style="{StaticResource DataLabel}"/>
+                                <Label x:Name="LastRunLabel" Text="Never" Style="{StaticResource ValueLabel}"/>
+                            </VerticalStackLayout>
+                            
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="Upcoming Task" Style="{StaticResource DataLabel}"/>
+                                <Label x:Name="NextRunLabel" Text="Not scheduled" Style="{StaticResource ValueLabel}"/>
+                            </VerticalStackLayout>
                         </Grid>
                     </VerticalStackLayout>
-                    
-                    <VerticalStackLayout x:Name="FriendsListContainer" Spacing="16">
-                        <Label x:Name="NoFriendsLabel" Text="No friends added yet. Tap 'Add Friend' above." FontSize="14" TextColor="{StaticResource Gray500}" HorizontalOptions="Center" IsVisible="True"/>
+                </Border>
+
+                <!-- TikTok Session Card -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="Account Connection" Style="{StaticResource SectionLabel}"/>
+                        <Grid>
+                            <Button x:Name="LoginButton"
+                                    Text="Connecting Account"
+                                    Style="{StaticResource Button}"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="10"
+                                    HeightRequest="52"
+                                    Clicked="OnLoginClicked"/>
+                            
+                            <HorizontalStackLayout x:Name="SessionCheckingIndicator" 
+                                                   IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                                <ActivityIndicator IsRunning="True" Color="White" HeightRequest="20" WidthRequest="20"/>
+                                <Label Text="Validating session" TextColor="White" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                        <WebView x:Name="SessionCheckWebView" HeightRequest="0" WidthRequest="0" IsVisible="False" Navigated="OnSessionCheckNavigated"/>
                     </VerticalStackLayout>
-                </VerticalStackLayout>
+                </Border>
 
-                <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-
-                <!-- 6. Run History -->
-                <VerticalStackLayout Spacing="16">
-                    <Label Text="Recent Activity" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
-                    <VerticalStackLayout x:Name="HistoryContainer" Spacing="16">
-                        <Label x:Name="NoHistoryLabel" Text="No activity yet." FontSize="14" TextColor="{StaticResource Gray500}" HorizontalOptions="Center"/>
+                <!-- Message Template Card -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Streak Message" Style="{StaticResource SectionLabel}"/>
+                        <Border Stroke="{AppThemeBinding Light={StaticResource BorderColorLight}, Dark={StaticResource BorderColorDark}}" 
+                                StrokeThickness="1" StrokeShape="RoundRectangle 8" BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Editor x:Name="MessageEditor" 
+                                    Placeholder="Enter message to send daily" 
+                                    HeightRequest="80" 
+                                    Margin="4" 
+                                    AutoSize="TextChanges"
+                                    TextChanged="OnMessageChanged"/>
+                        </Border>
                     </VerticalStackLayout>
-                </VerticalStackLayout>
+                </Border>
 
-                <BoxView HeightRequest="20" Color="Transparent"/>
+                <!-- Friends Management Card -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="16">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <Label Text="Daily Recipients" Style="{StaticResource SectionLabel}"/>
+                            <Button Grid.Column="1" Text="Add New" Style="{StaticResource TextButton}" Clicked="OnAddFriendClicked" Margin="0,-4,0,0"/>
+                        </Grid>
+                        
+                        <Border IsVisible="True" Stroke="{AppThemeBinding Light={StaticResource BorderColorLight}, Dark={StaticResource BorderColorDark}}" 
+                                StrokeThickness="1" StrokeShape="RoundRectangle 8" BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <SearchBar x:Name="FriendsSearchBar" 
+                                       Placeholder="Quick search list" 
+                                       TextChanged="OnSearchTextChanged" 
+                                       BackgroundColor="Transparent"/>
+                        </Border>
+                        
+                        <!-- Add Friend Inline Panel -->
+                        <VerticalStackLayout x:Name="AddFriendPanel" IsVisible="False" Spacing="12" Margin="0,8,0,0">
+                            <Border Stroke="{AppThemeBinding Light={StaticResource BorderColorLight}, Dark={StaticResource BorderColorDark}}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                                <Entry x:Name="NewFriendUsernameEntry" Placeholder="Username" Margin="8,4"/>
+                            </Border>
+                            <Border Stroke="{AppThemeBinding Light={StaticResource BorderColorLight}, Dark={StaticResource BorderColorDark}}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                                <Entry x:Name="NewFriendDisplayNameEntry" Placeholder="Display Name" Margin="8,4"/>
+                            </Border>
+                            <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
+                                <Button Text="Dismiss" Style="{StaticResource TextButton}" TextColor="{StaticResource Gray500}" HeightRequest="44" Clicked="OnCancelAddFriend"/>
+                                <Button Grid.Column="1" Text="Confirm" BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="8" HeightRequest="44" Clicked="OnSaveFriend"/>
+                            </Grid>
+                        </VerticalStackLayout>
+                        
+                        <VerticalStackLayout x:Name="FriendsListContainer" Spacing="8">
+                            <Label x:Name="NoFriendsLabel" Text="Recipients list is empty" Style="{StaticResource DataLabel}" HorizontalOptions="Center" Margin="0,16"/>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Recent Activity Card -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Performance History" Style="{StaticResource SectionLabel}"/>
+                        <VerticalStackLayout x:Name="HistoryContainer" Spacing="12">
+                            <Label x:Name="NoHistoryLabel" Text="No automation history found" Style="{StaticResource DataLabel}" HorizontalOptions="Center" Margin="0,12"/>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <BoxView HeightRequest="40" Color="Transparent"/>
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- 7. Fixed Bottom Controls -->
+        <!-- Fixed Interactive Console -->
         <Border Grid.Row="1" 
                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}"
-                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                Stroke="{AppThemeBinding Light={StaticResource BorderColorLight}, Dark={StaticResource BorderColorDark}}"
                 StrokeThickness="1"
                 StrokeShape="Rectangle">
-            <VerticalStackLayout Padding="24" Spacing="20">
+            <VerticalStackLayout Padding="20,16,20,32" Spacing="16">
                 <!-- Master background switch -->
                 <Grid ColumnDefinitions="*, Auto">
-                    <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="2">
-                        <Label Text="Background Scheduler" FontSize="16" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
-                        <Label Text="Run dynamically in the background" FontSize="13" TextColor="{StaticResource Gray500}"/>
+                    <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="1">
+                        <Label Text="Automation Engine" FontSize="15" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
+                        <Label Text="Maintain background scheduler" FontSize="11" TextColor="{StaticResource Gray500}"/>
                     </VerticalStackLayout>
                     <Switch x:Name="ScheduleSwitch" Grid.Column="1" VerticalOptions="Center" Toggled="OnScheduleToggled"/>
                 </Grid>
 
                 <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
-                    <Button Text="Permissions"
+                    <Button Text="Config"
                             Style="{StaticResource TextButton}"
                             TextColor="{StaticResource Gray500}"
-                            HeightRequest="50"
+                            HeightRequest="52"
                             Clicked="OnPermissionsClicked"/>
                     <Button Grid.Column="1"
                             x:Name="RunNowButton"
-                            Text="Run Manually"
+                            Text="Manual Execution"
                             BackgroundColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"
                             TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
                             FontAttributes="Bold"
-                            CornerRadius="8"
-                            HeightRequest="50"
+                            CornerRadius="10"
+                            HeightRequest="52"
                             Clicked="OnRunNowClicked"/>
                 </Grid>
             </VerticalStackLayout>

@@ -157,8 +157,8 @@ public partial class MainPage : ContentPage
     {
         if (isChecking)
         {
-            LoginButton.Text = "Checking session...";
-            LoginButton.BackgroundColor = Color.FromArgb("#888888");
+            LoginButton.Text = "Verifying Connection";
+            LoginButton.BackgroundColor = Color.FromArgb("#737373");
             LoginButton.IsEnabled = false;
             SessionCheckingIndicator.IsVisible = true;
             RunNowButton.IsEnabled = false;
@@ -166,8 +166,8 @@ public partial class MainPage : ContentPage
         }
         else if (isSessionValid)
         {
-            LoginButton.Text = "Session Connected";
-            LoginButton.BackgroundColor = Color.FromArgb("#4CAF50"); // Green
+            LoginButton.Text = "Account Synchronized";
+            LoginButton.BackgroundColor = Color.FromArgb("#4CAF50");
             LoginButton.IsEnabled = false;
             SessionCheckingIndicator.IsVisible = false;
             RunNowButton.IsEnabled = true;
@@ -175,8 +175,8 @@ public partial class MainPage : ContentPage
         }
         else
         {
-            LoginButton.Text = "Login to TikTok";
-            LoginButton.BackgroundColor = Color.FromArgb("#FE2C55"); // Primary red
+            LoginButton.Text = "Connect TikTok Account";
+            LoginButton.BackgroundColor = Color.FromArgb("#FE2C55");
             LoginButton.IsEnabled = true;
             SessionCheckingIndicator.IsVisible = false;
             RunNowButton.IsEnabled = false;
@@ -286,6 +286,15 @@ public partial class MainPage : ContentPage
 
     private View CreateFriendView(FriendConfig friend)
     {
+        var card = new Border
+        {
+            Style = Application.Current?.Resources["SectionCard"] as Style,
+            Padding = new Thickness(12, 8),
+            Margin = new Thickness(0, 0, 0, 2),
+            BackgroundColor = Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#222222" : "#F9F9F9"),
+            StrokeThickness = 0.5
+        };
+
         var grid = new Grid
         {
             ColumnDefinitions = new ColumnDefinitionCollection
@@ -295,35 +304,35 @@ public partial class MainPage : ContentPage
                 new ColumnDefinition { Width = GridLength.Auto },
                 new ColumnDefinition { Width = GridLength.Auto }
             },
-            ColumnSpacing = 8,
-            Padding = new Thickness(0, 4)
+            ColumnSpacing = 4
         };
 
-        var infoStack = new VerticalStackLayout { Spacing = 2, VerticalOptions = LayoutOptions.Center };
+        var infoStack = new VerticalStackLayout { Spacing = 1, VerticalOptions = LayoutOptions.Center };
         
         var displayName = string.IsNullOrEmpty(friend.DisplayName) ? friend.Username : friend.DisplayName;
         infoStack.Children.Add(new Label
         {
             Text = displayName,
-            FontSize = 16,
-            FontAttributes = FontAttributes.Bold
+            FontSize = 15,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#FFFFFF" : "#171717")
         });
         
         infoStack.Children.Add(new Label
         {
             Text = $"@{friend.Username}",
-            FontSize = 13,
-            TextColor = Color.FromArgb("#888888")
+            FontSize = 12,
+            TextColor = Color.FromArgb("#737373")
         });
 
         if (friend.LastMessageSent.HasValue)
         {
-            var successIcon = friend.SuccessCount > 0 ? "✓" : "";
             infoStack.Children.Add(new Label
             {
-                Text = $"{successIcon} Last: {friend.LastMessageSent.Value:MMM dd}",
-                FontSize = 11,
-                TextColor = Color.FromArgb("#4CAF50")
+                Text = $"Last Success: {friend.LastMessageSent.Value:MMM dd}",
+                FontSize = 10,
+                TextColor = Color.FromArgb("#4CAF50"),
+                Margin = new Thickness(0, 2, 0, 0)
             });
         }
 
@@ -332,7 +341,8 @@ public partial class MainPage : ContentPage
         var toggleSwitch = new Switch
         {
             IsToggled = friend.IsEnabled,
-            VerticalOptions = LayoutOptions.Center
+            VerticalOptions = LayoutOptions.Center,
+            Scale = 0.85
         };
         toggleSwitch.Toggled += (s, e) =>
         {
@@ -352,7 +362,8 @@ public partial class MainPage : ContentPage
         {
             Text = "Edit",
             Style = textButtonStyle as Style,
-            VerticalOptions = LayoutOptions.Center
+            VerticalOptions = LayoutOptions.Center,
+            FontSize = 12
         };
         editButton.Clicked += (s, e) =>
         {
@@ -367,15 +378,16 @@ public partial class MainPage : ContentPage
 
         var deleteButton = new Button
         {
-            Text = "Remove",
+            Text = "Delete",
             Style = textButtonStyle as Style,
             TextColor = Color.FromArgb("#F44336"),
-            VerticalOptions = LayoutOptions.Center
+            VerticalOptions = LayoutOptions.Center,
+            FontSize = 12
         };
         deleteButton.Clicked += async (s, e) =>
         {
-            var confirm = await DisplayAlert("Remove Friend", 
-                $"Remove {displayName} from the list?", "Remove", "Cancel");
+            var confirm = await DisplayAlert("Confirm Action", 
+                $"Remove {displayName}?", "Delete", "Keep");
             if (confirm)
             {
                 _settingsService.RemoveFriend(friend.Id);
@@ -386,7 +398,8 @@ public partial class MainPage : ContentPage
         Grid.SetColumn(deleteButton, 3);
         grid.Children.Add(deleteButton);
 
-        return grid;
+        card.Content = grid;
+        return card;
     }
 
     private void LoadHistory()
@@ -416,8 +429,16 @@ public partial class MainPage : ContentPage
     {
         var successCount = run.FriendResults.Count(r => r.Success);
         var totalCount = run.FriendResults.Count;
-        var statusIcon = run.Success ? "✓" : "✗";
         var statusColor = run.Success ? Color.FromArgb("#4CAF50") : Color.FromArgb("#F44336");
+
+        var card = new Border
+        {
+            Padding = new Thickness(12, 10),
+            BackgroundColor = Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#222222" : "#F9F9F9"),
+            Stroke = Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#333333" : "#E5E5E5"),
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(8) }
+        };
 
         var grid = new Grid
         {
@@ -427,32 +448,33 @@ public partial class MainPage : ContentPage
                 new ColumnDefinition { Width = GridLength.Star },
                 new ColumnDefinition { Width = GridLength.Auto }
             },
-            ColumnSpacing = 8
+            ColumnSpacing = 12
         };
 
-        var iconLabel = new Label
+        var statusLine = new BoxView
         {
-            Text = statusIcon,
-            FontSize = 16,
-            TextColor = statusColor,
-            VerticalOptions = LayoutOptions.Center
+            WidthRequest = 4,
+            CornerRadius = 2,
+            BackgroundColor = statusColor,
+            VerticalOptions = LayoutOptions.Fill
         };
-        grid.Children.Add(iconLabel);
+        grid.Children.Add(statusLine);
 
-        var infoStack = new VerticalStackLayout { Spacing = 2 };
+        var infoStack = new VerticalStackLayout { Spacing = 2, VerticalOptions = LayoutOptions.Center };
         infoStack.Children.Add(new Label
         {
             Text = run.RunTime.ToString("MMM dd, HH:mm"),
-            FontSize = 14
+            FontSize = 14,
+            TextColor = Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#FFFFFF" : "#171717")
         });
         
         if (totalCount > 0)
         {
             infoStack.Children.Add(new Label
             {
-                Text = $"{successCount}/{totalCount} messages sent",
+                Text = $"{successCount} / {totalCount} successful",
                 FontSize = 12,
-                TextColor = Color.FromArgb("#888888")
+                TextColor = Color.FromArgb("#737373")
             });
         }
         else if (!string.IsNullOrEmpty(run.ErrorMessage))
@@ -469,7 +491,8 @@ public partial class MainPage : ContentPage
         Grid.SetColumn(infoStack, 1);
         grid.Children.Add(infoStack);
 
-        return grid;
+        card.Content = grid;
+        return card;
     }
 
     private void OnScheduleToggled(object? sender, ToggledEventArgs e)
