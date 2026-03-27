@@ -354,13 +354,13 @@ public partial class MainPage : ContentPage
 
         var editButton = new Button
         {
-            Text = "✏️",
+            Text = "Edit",
             BackgroundColor = Colors.Transparent,
-            TextColor = Color.FromArgb("#4CAF50"),
-            FontSize = 18,
-            Padding = new Thickness(8),
-            HeightRequest = 44,
-            WidthRequest = 44,
+            TextColor = Application.Current?.RequestedTheme == AppTheme.Dark ? Colors.LightSkyBlue : Colors.Blue,
+            FontSize = 14,
+            FontAttributes = FontAttributes.Bold,
+            Padding = new Thickness(8, 0),
+            HeightRequest = 36,
             VerticalOptions = LayoutOptions.Center
         };
         editButton.Clicked += (s, e) =>
@@ -376,13 +376,13 @@ public partial class MainPage : ContentPage
 
         var deleteButton = new Button
         {
-            Text = "🗑️",
+            Text = "Remove",
             BackgroundColor = Colors.Transparent,
-            TextColor = Color.FromArgb("#F44336"),
-            FontSize = 18,
-            Padding = new Thickness(8),
-            HeightRequest = 44,
-            WidthRequest = 44,
+            TextColor = Color.FromArgb("#FE2C55"),
+            FontSize = 14,
+            FontAttributes = FontAttributes.Bold,
+            Padding = new Thickness(8, 0),
+            HeightRequest = 36,
             VerticalOptions = LayoutOptions.Center
         };
         deleteButton.Clicked += async (s, e) =>
@@ -400,6 +400,7 @@ public partial class MainPage : ContentPage
         grid.Children.Add(deleteButton);
 
         border.Content = grid;
+        grid.Padding = new Thickness(0, 8);
         return border;
     }
 

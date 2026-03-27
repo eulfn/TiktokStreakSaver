@@ -48,27 +48,26 @@
         </Grid>
         
         <!-- Footer Actions -->
-        <Frame Grid.Row="2"
-               BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-               CornerRadius="0"
-               Padding="16"
-               HasShadow="False">
-            <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
-                <Button Text="← Back"
-                        BackgroundColor="{StaticResource Gray600}"
-                        TextColor="White"
+        <VerticalStackLayout Grid.Row="2" Spacing="16" Padding="24">
+            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}" />
+            <Grid ColumnDefinitions="*, *" ColumnSpacing="16">
+                <Button Text="Return"
+                        BackgroundColor="Transparent"
+                        BorderColor="{StaticResource Gray400}"
+                        BorderWidth="1"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
                         CornerRadius="8"
-                        HeightRequest="44"
+                        HeightRequest="48"
                         Clicked="OnBackClicked"/>
                 <Button Grid.Column="1"
-                        Text="🔄 Refresh"
-                        BackgroundColor="{StaticResource Gray600}"
-                        TextColor="White"
+                        Text="Reload Page"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                        TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
                         CornerRadius="8"
-                        HeightRequest="44"
+                        HeightRequest="48"
                         Clicked="OnRefreshClicked"/>
             </Grid>
-        </Frame>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>
 
