@@ -37,6 +37,7 @@ public class StreakService : Service
     private PowerManager.WakeLock? _wakeLock;
     private string BaseScript = string.Empty;
     private string? _currentlyProcessingUsername;
+    private bool _isAutomationStarted;
 
     public override void OnCreate()
     {
@@ -187,6 +188,7 @@ public class StreakService : Service
             _friendsToProcess = _settingsService?.GetEnabledFriends() ?? new List<FriendConfig>();
             _currentFriendIndex = 0;
             _runResult = new StreakRunResult();
+            _isAutomationStarted = false;
 
             if (_friendsToProcess.Count == 0)
             {
@@ -275,8 +277,12 @@ public class StreakService : Service
         // Check if we're on the messages page
         if (url.Contains("tiktok.com/messages"))
         {
-            // Wait a bit for the page to fully render, then start automation
-            _mainHandler?.PostDelayed(ProcessNextFriend, 3000);
+            if (!_isAutomationStarted)
+            {
+                _isAutomationStarted = true;
+                // Wait a bit for the page to fully render, then start automation
+                _mainHandler?.PostDelayed(ProcessNextFriend, 3000);
+            }
         }
         else if (url.Contains("login"))
         {
@@ -287,32 +293,57 @@ public class StreakService : Service
 
     private void ProcessNextFriend()
     {
-        if (_friendsToProcess == null || _currentFriendIndex >= _friendsToProcess.Count)
+        try
         {
-            // All friends processed
-            CompleteService(true, "All messages sent successfully");
-            return;
-        }
-
-        var friend = _friendsToProcess[_currentFriendIndex];
-        _currentlyProcessingUsername = friend.Username;
-        
-        UpdateNotification($"Sending to {friend.DisplayName ?? friend.Username}... ({_currentFriendIndex + 1}/{_friendsToProcess.Count})",
-                          _currentFriendIndex, _friendsToProcess.Count);
-
-        var message = _settingsService?.GetMessageText() ?? SettingsService.DefaultMessage;
-
-        // Inject JavaScript to find and message the friend
-        var js = GetFriendMessageScript(friend.Username, message);
-        _webView?.EvaluateJavascript(js, null);
-
-        // Failsafe timeout mechanism - increased to 120s as TikTok chat lists can be long
-        _mainHandler?.PostDelayed(() => {
-            if (_currentlyProcessingUsername != null && _currentlyProcessingUsername.Equals(friend.Username, StringComparison.OrdinalIgnoreCase))
+            if (_friendsToProcess == null || _currentFriendIndex >= _friendsToProcess.Count)
             {
-                OnMessageResult(friend.Username, false, "Chat timeout or not found");
+                // All friends processed
+                CompleteService(true, "All messages sent successfully");
+                return;
             }
-        }, 120000);
+
+            var friend = _friendsToProcess[_currentFriendIndex];
+            
+            // Abort previous script payload to prevent ghost scripts
+            _webView?.EvaluateJavascript("window.abortAutomation = true;", null);
+
+            if (friend == null)
+            {
+                _currentlyProcessingUsername = "Unknown";
+                OnMessageResult("Unknown", false, "Friend configuration is missing");
+                return;
+            }
+
+            _currentlyProcessingUsername = friend.Username ?? "Unknown";
+            
+            UpdateNotification($"Sending to {friend.DisplayName ?? friend.Username}... ({_currentFriendIndex + 1}/{_friendsToProcess.Count})",
+                              _currentFriendIndex, _friendsToProcess.Count);
+
+            if (string.IsNullOrWhiteSpace(friend.Username))
+            {
+                OnMessageResult(_currentlyProcessingUsername, false, "Username is empty or null");
+                return;
+            }
+
+            var message = _settingsService?.GetMessageText() ?? SettingsService.DefaultMessage;
+
+            // Inject JavaScript to find and message the friend
+            var js = GetFriendMessageScript(friend.Username, message);
+            _webView?.EvaluateJavascript(js, null);
+
+            // Failsafe timeout mechanism - increased to 120s as TikTok chat lists can be long
+            _mainHandler?.PostDelayed(() => {
+                if (_currentlyProcessingUsername != null && _currentlyProcessingUsername.Equals(friend.Username, StringComparison.OrdinalIgnoreCase))
+                {
+                    OnMessageResult(friend.Username, false, "Chat timeout or not found");
+                }
+            }, 120000);
+        }
+        catch (Exception ex)
+        {
+            var username = _currentlyProcessingUsername ?? "Unknown";
+            OnMessageResult(username, false, $"Failed processing friend: {ex.Message}");
+        }
     }
 
     private string GetFriendMessageScript(string username, string message)
@@ -335,7 +366,7 @@ public class StreakService : Service
 
         if (_friendsToProcess == null || _settingsService == null) return;
 
-        var friend = _friendsToProcess.FirstOrDefault(f => f.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+        var friend = _friendsToProcess.FirstOrDefault(f => f.Username != null && f.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
 
         if (friend != null)
         {
@@ -384,7 +415,13 @@ public class StreakService : Service
                 {
                     int successCount = _runResult.FriendResults.Count(r => r.Success);
                     int totalCount = _runResult.FriendResults.Count;
-                    notificationMessage = $"{successCount} / {totalCount} streaks sent successfully";
+                    
+                    if (successCount == totalCount)
+                        notificationMessage = $"{successCount}/{totalCount} streaks sent successfully";
+                    else if (successCount == 0)
+                        notificationMessage = $"0/{totalCount} streaks failed to send";
+                    else
+                        notificationMessage = $"{successCount}/{totalCount} Mixed - partial streaks sent";
                 }
             }
 

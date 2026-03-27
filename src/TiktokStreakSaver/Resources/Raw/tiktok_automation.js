@@ -249,6 +249,11 @@
     };
 
     var checkNextChat = function () {
+        if (window.abortAutomation) {
+            log('Manual abort triggered. Stopping sequence.');
+            return;
+        }
+
         if (found || chatIndex >= chatItems.length) {
             if (!found) {
                 log('User not found after checking all chats');
@@ -272,6 +277,7 @@
     };
 
     var init = function () {
+        window.abortAutomation = false; // Reset abort flag
         try {
             if (userName.startsWith('@')) {
                 userName = userName.substring(1);
