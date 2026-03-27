@@ -4,6 +4,7 @@
 (function () {
     var userName = '[UserName]';
     var message = '[Message]';
+    var runId = '[RunId]';
     var found = false;
     var chatIndex = 0;
     var chatItems = [];
@@ -192,6 +193,7 @@
     };
 
     var reportSuccess = function () {
+        if (window.currentRunId !== runId) return;
         log('Message sent to ' + userName);
         if (typeof StreakApp !== 'undefined') {
         StreakApp.onMessageSent(userName, true, '');
@@ -199,6 +201,7 @@
     };
 
     var reportError = function (errorMessage) {
+        if (window.currentRunId !== runId) return;
         log(errorMessage);
          if (typeof StreakApp !== 'undefined') {
         StreakApp.onMessageSent(userName, false, errorMessage);
@@ -249,8 +252,8 @@
     };
 
     var checkNextChat = function () {
-        if (window.abortAutomation) {
-            log('Manual abort triggered. Stopping sequence.');
+        if (window.currentRunId !== runId) {
+            log('Manual abort triggered: Session superseded. Stopping sequence.');
             return;
         }
 
@@ -277,7 +280,7 @@
     };
 
     var init = function () {
-        window.abortAutomation = false; // Reset abort flag
+        window.currentRunId = runId; // Bind global context to the latest script injection
         try {
             if (userName.startsWith('@')) {
                 userName = userName.substring(1);

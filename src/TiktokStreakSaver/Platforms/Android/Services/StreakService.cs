@@ -303,9 +303,6 @@ public class StreakService : Service
             }
 
             var friend = _friendsToProcess[_currentFriendIndex];
-            
-            // Abort previous script payload to prevent ghost scripts
-            _webView?.EvaluateJavascript("window.abortAutomation = true;", null);
 
             if (friend == null)
             {
@@ -352,9 +349,9 @@ public class StreakService : Service
         var escapedUsername = username.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\"", "\\\"");
         var escapedMessage = message.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\"", "\\\"").Replace("\n", "\\n");
 
-
         var automationScript = this.BaseScript.Replace("[UserName]", escapedUsername);
         automationScript = automationScript.Replace("[Message]", escapedMessage);
+        automationScript = automationScript.Replace("[RunId]", System.Guid.NewGuid().ToString("N"));
 
         return automationScript;
     }
