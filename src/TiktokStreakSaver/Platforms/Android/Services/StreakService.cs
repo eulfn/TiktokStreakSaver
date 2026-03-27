@@ -34,6 +34,7 @@ public class StreakService : Service
     private StreakRunResult? _runResult;
     private PowerManager.WakeLock? _wakeLock;
     private string BaseScript = string.Empty;
+    private string? _currentlyProcessingUsername;
 
     public override void OnCreate()
     {
@@ -297,6 +298,8 @@ public class StreakService : Service
         }
 
         var friend = _friendsToProcess[_currentFriendIndex];
+        _currentlyProcessingUsername = friend.Username;
+        
         UpdateNotification($"Sending to {friend.DisplayName ?? friend.Username}... ({_currentFriendIndex + 1}/{_friendsToProcess.Count})",
                           _currentFriendIndex, _friendsToProcess.Count);
 
@@ -305,6 +308,14 @@ public class StreakService : Service
         // Inject JavaScript to find and message the friend
         var js = GetFriendMessageScript(friend.Username, message);
         _webView?.EvaluateJavascript(js, null);
+
+        // Failsafe timeout mechanism
+        _mainHandler?.PostDelayed(() => {
+            if (_currentlyProcessingUsername == friend.Username)
+            {
+                OnMessageResult(friend.Username, false, "Chat timeout or not found");
+            }
+        }, 30000);
     }
 
     private string GetFriendMessageScript(string username, string message)
@@ -322,6 +333,9 @@ public class StreakService : Service
 
     internal void OnMessageResult(string username, bool success, string error)
     {
+        if (username != _currentlyProcessingUsername) return; // Prevent duplicate callbacks from delayed JS or duplicate messages
+        _currentlyProcessingUsername = null; // Mark as processed
+
         if (_friendsToProcess == null || _settingsService == null) return;
 
         var friend = _friendsToProcess.FirstOrDefault(f => f.Username.Equals(username, StringComparison.OrdinalIgnoreCase));

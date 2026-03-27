@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Controls.Shapes;
+using Microsoft.Maui.Controls.Shapes;
 using TiktokStreakSaver.Models;
 using TiktokStreakSaver.Services;
 
@@ -10,6 +10,7 @@ public partial class MainPage : ContentPage
     private readonly SessionService _sessionService;
     private bool _isCheckingSession = false;
     private bool _sessionCheckCompleted = false;
+    private string? _editingFriendId;
 
     public MainPage()
     {
@@ -251,7 +252,18 @@ public partial class MainPage : ContentPage
 
     private void LoadFriendsList()
     {
-        var friends = _settingsService.GetFriendsList();
+        var friends = _settingsService.GetFriendsList()
+            .OrderBy(f => f.DisplayName)
+            .ThenBy(f => f.Username)
+            .ToList();
+
+        var query = FriendsSearchBar.Text?.ToLower();
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            friends = friends.Where(f => 
+                f.Username.ToLower().Contains(query) || 
+                f.DisplayName.ToLower().Contains(query)).ToList();
+        }
 
         // Clear existing friend items (except NoFriendsLabel)
         var itemsToRemove = FriendsListContainer.Children
@@ -289,6 +301,7 @@ public partial class MainPage : ContentPage
             ColumnDefinitions = new ColumnDefinitionCollection
             {
                 new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto },
                 new ColumnDefinition { Width = GridLength.Auto },
                 new ColumnDefinition { Width = GridLength.Auto }
             },
@@ -339,6 +352,28 @@ public partial class MainPage : ContentPage
         Grid.SetColumn(toggleSwitch, 1);
         grid.Children.Add(toggleSwitch);
 
+        var editButton = new Button
+        {
+            Text = "✏️",
+            BackgroundColor = Colors.Transparent,
+            TextColor = Color.FromArgb("#4CAF50"),
+            FontSize = 18,
+            Padding = new Thickness(8),
+            HeightRequest = 44,
+            WidthRequest = 44,
+            VerticalOptions = LayoutOptions.Center
+        };
+        editButton.Clicked += (s, e) =>
+        {
+            _editingFriendId = friend.Id;
+            NewFriendUsernameEntry.Text = friend.Username;
+            NewFriendDisplayNameEntry.Text = friend.DisplayName;
+            AddFriendPanel.IsVisible = true;
+            NewFriendUsernameEntry.Focus();
+        };
+        Grid.SetColumn(editButton, 2);
+        grid.Children.Add(editButton);
+
         var deleteButton = new Button
         {
             Text = "🗑️",
@@ -361,7 +396,7 @@ public partial class MainPage : ContentPage
                 UpdateStatus();
             }
         };
-        Grid.SetColumn(deleteButton, 2);
+        Grid.SetColumn(deleteButton, 3);
         grid.Children.Add(deleteButton);
 
         border.Content = grid;
@@ -478,6 +513,11 @@ public partial class MainPage : ContentPage
         }
     }
 
+    private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        LoadFriendsList();
+    }
+
     private async void OnLoginClicked(object? sender, EventArgs e)
     {
         // Reset session check so it will revalidate when returning
@@ -487,6 +527,7 @@ public partial class MainPage : ContentPage
 
     private void OnAddFriendClicked(object? sender, EventArgs e)
     {
+        _editingFriendId = null;
         AddFriendPanel.IsVisible = true;
         NewFriendUsernameEntry.Text = string.Empty;
         NewFriendDisplayNameEntry.Text = string.Empty;
@@ -495,6 +536,7 @@ public partial class MainPage : ContentPage
 
     private void OnCancelAddFriend(object? sender, EventArgs e)
     {
+        _editingFriendId = null;
         AddFriendPanel.IsVisible = false;
     }
 
@@ -509,22 +551,41 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        // Check for duplicate
         var existingFriends = _settingsService.GetFriendsList();
-        if (existingFriends.Any(f => f.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
+        
+        // Check for duplicate ONLY if it's a new friend or username changed
+        if (string.IsNullOrEmpty(_editingFriendId) || 
+            existingFriends.FirstOrDefault(f => f.Id == _editingFriendId)?.Username != username)
         {
-            await DisplayAlert("Error", "This friend is already in your list", "OK");
-            return;
+            if (existingFriends.Any(f => f.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
+            {
+                await DisplayAlert("Error", "This friend is already in your list", "OK");
+                return;
+            }
         }
 
-        var friend = new FriendConfig
+        if (!string.IsNullOrEmpty(_editingFriendId))
         {
-            Username = username,
-            DisplayName = displayName ?? string.Empty,
-            IsEnabled = true
-        };
+            var editingFriend = existingFriends.FirstOrDefault(f => f.Id == _editingFriendId);
+            if (editingFriend != null)
+            {
+                editingFriend.Username = username;
+                editingFriend.DisplayName = displayName ?? string.Empty;
+                _settingsService.UpdateFriend(editingFriend);
+            }
+        }
+        else
+        {
+            var friend = new FriendConfig
+            {
+                Username = username,
+                DisplayName = displayName ?? string.Empty,
+                IsEnabled = true
+            };
+            _settingsService.AddFriend(friend);
+        }
 
-        _settingsService.AddFriend(friend);
+        _editingFriendId = null;
         AddFriendPanel.IsVisible = false;
         LoadFriendsList();
         UpdateStatus();
