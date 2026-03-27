@@ -21,6 +21,11 @@
     };
 
     var findCurrentChatUsername = function () {
+        var extractUsername = function(href) {
+            var match = href.match(/\/@([^\/?&#]+)/);
+            return match && match[1] ? match[1].trim() : '';
+        };
+
         // Find the username from the chat header (the opened conversation)
         var chatHeader = document.querySelector('[class*="ChatHeader"]') ||
                          document.querySelector('[class*="chatHeader"]') ||
@@ -29,9 +34,7 @@
         if (chatHeader) {
             var headerLink = chatHeader.querySelector('a[href*="/@"]');
             if (headerLink) {
-                var href = headerLink.getAttribute('href') || '';
-                var match = href.match(/\/@([^\/]+)/);
-                return match ? match[1] : '';
+                return extractUsername(headerLink.getAttribute('href') || '');
             }
         }
         
@@ -44,11 +47,8 @@
             
             // Skip inbox items, only look at header/none area
             if (!parentAttr || parentAttr === 'chat-header') {
-                var href = link.getAttribute('href') || '';
-                var match = href.match(/\/@([^\/]+)/);
-                if (match && match[1]) {
-                    return match[1];
-                }
+                var username = extractUsername(link.getAttribute('href') || '');
+                if (username) return username;
             }
         }
         
