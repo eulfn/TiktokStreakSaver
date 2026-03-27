@@ -26,8 +26,8 @@ public partial class LoginPage : ContentPage
         LoadingOverlay.IsVisible = true;
         
 #if ANDROID
-        // Configure WebView using helper with random user agent
-        TikTokWebViewHelper.ConfigureWebView(TikTokWebView, RandomUa.RandomUserAgent);
+        // Configure WebView using helper with default Mobile user agent
+        TikTokWebViewHelper.ConfigureWebView(TikTokWebView, null);
 #endif
 
         TikTokWebView.Source = TikTokWebViewHelper.LoginUrl;

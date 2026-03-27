@@ -375,6 +375,8 @@ public class StreakService : Service
     {
         try
         {
+            string notificationMessage = success ? "Streaks sent successfully!" : $"Failed: {message}";
+
             // Update run result
             if (_runResult != null && _settingsService != null)
             {
@@ -382,12 +384,19 @@ public class StreakService : Service
                 _runResult.ErrorMessage = success ? null : message;
                 _settingsService.AddRunResult(_runResult);
                 _settingsService.SetLastRunTime(DateTime.Now);
+
+                if (success && _runResult.FriendResults.Count > 0)
+                {
+                    int successCount = _runResult.FriendResults.Count(r => r.Success);
+                    int totalCount = _runResult.FriendResults.Count;
+                    notificationMessage = $"{successCount} / {totalCount} streaks sent successfully";
+                }
             }
 
             // Show completion notification briefly
             var finalNotification = new NotificationCompat.Builder(this, ChannelId)
                 .SetContentTitle("TikTok Streak Saver")
-                .SetContentText(success ? "Streaks sent successfully!" : $"Failed: {message}")
+                .SetContentText(notificationMessage)
                 .SetSmallIcon(Resource.Drawable.ic_notification)
                 .SetAutoCancel(true)
                 .SetPriority(NotificationCompat.PriorityDefault)

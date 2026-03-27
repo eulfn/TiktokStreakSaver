@@ -97,11 +97,15 @@ public class SettingsService
     }
 
     /// <summary>
-    /// Get enabled friends only
+    /// Get the list of enabled friends to send messages to, sorted alphabetically
     /// </summary>
     public List<FriendConfig> GetEnabledFriends()
     {
-        return GetFriendsList().Where(f => f.IsEnabled).ToList();
+        return GetFriendsList()
+            .Where(f => f.IsEnabled)
+            .OrderBy(f => string.IsNullOrEmpty(f.DisplayName) ? f.Username : f.DisplayName)
+            .ThenBy(f => f.Username)
+            .ToList();
     }
 
     #endregion
