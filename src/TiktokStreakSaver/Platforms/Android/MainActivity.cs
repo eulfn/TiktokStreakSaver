@@ -24,10 +24,10 @@ namespace TiktokStreakSaver
             RequestNotificationPermission();
 
             // Configure dynamic native status bar
-            if (Application.Current != null)
+            if (Microsoft.Maui.Controls.Application.Current != null)
             {
-                Application.Current.RequestedThemeChanged += (s, e) => UpdateStatusBar(e.RequestedTheme);
-                UpdateStatusBar(Application.Current.RequestedTheme);
+                Microsoft.Maui.Controls.Application.Current.RequestedThemeChanged += (s, e) => UpdateStatusBar(e.RequestedTheme);
+                UpdateStatusBar(Microsoft.Maui.Controls.Application.Current.RequestedTheme);
             }
         }
 

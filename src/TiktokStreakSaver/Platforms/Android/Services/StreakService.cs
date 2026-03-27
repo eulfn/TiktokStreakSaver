@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 using AsyncAwaitBestPractices;
 using WebView = Android.Webkit.WebView;
 
+#nullable disable
+
 namespace TiktokStreakSaver.Platforms.Android.Services;
 
 [Service(Name = "com.jon2g.tiktokstreaksaver.Services.StreakService", ForegroundServiceType = global::Android.Content.PM.ForegroundService.TypeDataSync)]

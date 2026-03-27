@@ -5,6 +5,8 @@ using Android.Provider;
 using TiktokStreakSaver.Platforms.Android.Receivers;
 using TiktokStreakSaver.Services;
 
+#nullable disable
+
 namespace TiktokStreakSaver.Platforms.Android;
 
 /// <summary>
@@ -68,7 +70,7 @@ public static class StreakScheduler
         var triggerAtMillis = new DateTimeOffset(triggerTime).ToUnixTimeMilliseconds();
 
         // Use exact alarm for precise timing
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
         {
             // Android 12+ requires checking for exact alarm permission
             if (alarmManager.CanScheduleExactAlarms())
@@ -81,11 +83,11 @@ public static class StreakScheduler
                 alarmManager.SetAndAllowWhileIdle(AlarmType.RtcWakeup, triggerAtMillis, pendingIntent);
             }
         }
-        else if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
+        else if (OperatingSystem.IsAndroidVersionAtLeast(23))
         {
             alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, triggerAtMillis, pendingIntent);
         }
-        else if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+        else if (OperatingSystem.IsAndroidVersionAtLeast(19))
         {
             alarmManager.SetExact(AlarmType.RtcWakeup, triggerAtMillis, pendingIntent);
         }
@@ -133,7 +135,7 @@ public static class StreakScheduler
     {
         var serviceIntent = new Intent(context, typeof(Services.StreakService));
 
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+        if (OperatingSystem.IsAndroidVersionAtLeast(26))
         {
             context.StartForegroundService(serviceIntent);
         }
@@ -148,7 +150,7 @@ public static class StreakScheduler
     /// </summary>
     public static bool CanScheduleExactAlarms(Context context)
     {
-        if (Build.VERSION.SdkInt < BuildVersionCodes.S)
+        if (!OperatingSystem.IsAndroidVersionAtLeast(31))
         {
             return true;
         }
@@ -162,7 +164,7 @@ public static class StreakScheduler
     /// </summary>
     public static void RequestExactAlarmPermission(Context context)
     {
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
         {
             var intent = new Intent(Settings.ActionRequestScheduleExactAlarm);
             var packageName = context.PackageName;
@@ -180,7 +182,7 @@ public static class StreakScheduler
     /// </summary>
     public static void RequestBatteryOptimizationExemption(Context context)
     {
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
+        if (OperatingSystem.IsAndroidVersionAtLeast(23))
         {
             var powerManager = (PowerManager?)context.GetSystemService(Context.PowerService);
             var packageName = context.PackageName;
@@ -200,7 +202,7 @@ public static class StreakScheduler
     /// </summary>
     public static bool IsIgnoringBatteryOptimizations(Context context)
     {
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
+        if (OperatingSystem.IsAndroidVersionAtLeast(23))
         {
             var powerManager = (PowerManager?)context.GetSystemService(Context.PowerService);
             var packageName = context.PackageName;
