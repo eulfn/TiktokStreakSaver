@@ -71,10 +71,7 @@
     };
 
     var isTargetUser = function (currentUsername) {
-        if (!currentUsername) return false;
-        var cleanCurrent = currentUsername.trim().toLowerCase();
-        var cleanTarget = userName.trim().toLowerCase();
-        return cleanCurrent === cleanTarget;
+        return currentUsername && currentUsername.toLowerCase() === userName.toLowerCase();
     };
 
     var findDraftEditor = function (messageInput) {
