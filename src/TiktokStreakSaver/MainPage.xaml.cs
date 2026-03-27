@@ -166,7 +166,7 @@ public partial class MainPage : ContentPage
         }
         else if (isSessionValid)
         {
-            LoginButton.Text = "✓  Session OK";
+            LoginButton.Text = "Session Connected";
             LoginButton.BackgroundColor = Color.FromArgb("#4CAF50"); // Green
             LoginButton.IsEnabled = false;
             SessionCheckingIndicator.IsVisible = false;
@@ -175,7 +175,7 @@ public partial class MainPage : ContentPage
         }
         else
         {
-            LoginButton.Text = "🔐  Login to TikTok";
+            LoginButton.Text = "Login to TikTok";
             LoginButton.BackgroundColor = Color.FromArgb("#FE2C55"); // Primary red
             LoginButton.IsEnabled = true;
             SessionCheckingIndicator.IsVisible = false;
@@ -286,16 +286,6 @@ public partial class MainPage : ContentPage
 
     private View CreateFriendView(FriendConfig friend)
     {
-        var border = new Border
-        {
-            BackgroundColor = Application.Current?.RequestedTheme == AppTheme.Dark
-                ? Color.FromArgb("#2A2A2A")
-                : Color.FromArgb("#FFFFFF"),
-            StrokeShape = new RoundRectangle { CornerRadius = 12 },
-            Stroke = Colors.Transparent,
-            Padding = new Thickness(12)
-        };
-
         var grid = new Grid
         {
             ColumnDefinitions = new ColumnDefinitionCollection
@@ -305,23 +295,24 @@ public partial class MainPage : ContentPage
                 new ColumnDefinition { Width = GridLength.Auto },
                 new ColumnDefinition { Width = GridLength.Auto }
             },
-            ColumnSpacing = 8
+            ColumnSpacing = 8,
+            Padding = new Thickness(0, 4)
         };
 
-        var infoStack = new VerticalStackLayout { Spacing = 2 };
+        var infoStack = new VerticalStackLayout { Spacing = 2, VerticalOptions = LayoutOptions.Center };
         
         var displayName = string.IsNullOrEmpty(friend.DisplayName) ? friend.Username : friend.DisplayName;
         infoStack.Children.Add(new Label
         {
             Text = displayName,
-            FontSize = 14,
+            FontSize = 16,
             FontAttributes = FontAttributes.Bold
         });
         
         infoStack.Children.Add(new Label
         {
             Text = $"@{friend.Username}",
-            FontSize = 12,
+            FontSize = 13,
             TextColor = Color.FromArgb("#888888")
         });
 
@@ -352,15 +343,15 @@ public partial class MainPage : ContentPage
         Grid.SetColumn(toggleSwitch, 1);
         grid.Children.Add(toggleSwitch);
 
+        if (Application.Current?.Resources.TryGetValue("TextButton", out var textButtonStyle) != true)
+        {
+            textButtonStyle = null;
+        }
+
         var editButton = new Button
         {
             Text = "Edit",
-            BackgroundColor = Colors.Transparent,
-            TextColor = Application.Current?.RequestedTheme == AppTheme.Dark ? Colors.LightSkyBlue : Colors.Blue,
-            FontSize = 14,
-            FontAttributes = FontAttributes.Bold,
-            Padding = new Thickness(8, 0),
-            HeightRequest = 36,
+            Style = textButtonStyle as Style,
             VerticalOptions = LayoutOptions.Center
         };
         editButton.Clicked += (s, e) =>
@@ -377,12 +368,8 @@ public partial class MainPage : ContentPage
         var deleteButton = new Button
         {
             Text = "Remove",
-            BackgroundColor = Colors.Transparent,
-            TextColor = Color.FromArgb("#FE2C55"),
-            FontSize = 14,
-            FontAttributes = FontAttributes.Bold,
-            Padding = new Thickness(8, 0),
-            HeightRequest = 36,
+            Style = textButtonStyle as Style,
+            TextColor = Color.FromArgb("#F44336"),
             VerticalOptions = LayoutOptions.Center
         };
         deleteButton.Clicked += async (s, e) =>
@@ -399,9 +386,7 @@ public partial class MainPage : ContentPage
         Grid.SetColumn(deleteButton, 3);
         grid.Children.Add(deleteButton);
 
-        border.Content = grid;
-        grid.Padding = new Thickness(0, 8);
-        return border;
+        return grid;
     }
 
     private void LoadHistory()
