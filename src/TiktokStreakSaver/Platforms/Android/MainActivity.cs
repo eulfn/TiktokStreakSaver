@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -26,7 +26,7 @@ namespace TiktokStreakSaver
 
         private void CreateNotificationChannel()
         {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            if (OperatingSystem.IsAndroidVersionAtLeast(26))
             {
                 var channelId = "streak_service_channel";
                 var channelName = "Streak Service";
@@ -45,7 +45,7 @@ namespace TiktokStreakSaver
 
         private void RequestNotificationPermission()
         {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
             {
                 if (ContextCompat.CheckSelfPermission(this, Android.Manifest.Permission.PostNotifications) 
                     != Permission.Granted)

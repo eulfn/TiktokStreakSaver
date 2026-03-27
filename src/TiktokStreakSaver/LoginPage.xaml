@@ -16,7 +16,7 @@
         </Border>
         
         <!-- WebView Card -->
-        <Border Grid.Row="1" Margin="16,8" Style="{StaticResource SectionCard}" Padding="0" ClipBounds="True">
+        <Border Grid.Row="1" Margin="16,8" Style="{StaticResource SectionCard}" Padding="0">
             <Grid>
                 <WebView x:Name="TikTokWebView" Navigated="OnWebViewNavigated"/>
                 
