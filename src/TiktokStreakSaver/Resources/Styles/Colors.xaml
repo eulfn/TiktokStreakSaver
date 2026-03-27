@@ -37,9 +37,9 @@
     <Color x:Key="Gray950">#0A0A0A</Color>
     
     <Color x:Key="CardBackgroundLight">#FFFFFF</Color>
-    <Color x:Key="CardBackgroundDark">#1A1A1A</Color>
-    <Color x:Key="BorderColorLight">#E5E5E5</Color>
-    <Color x:Key="BorderColorDark">#2B2B2B</Color>
+    <Color x:Key="CardBackgroundDark">#161616</Color>
+    <Color x:Key="BorderColorLight">#EDEDED</Color>
+    <Color x:Key="BorderColorDark">#222222</Color>
 
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
