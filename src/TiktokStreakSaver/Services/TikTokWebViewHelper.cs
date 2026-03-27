@@ -58,6 +58,13 @@ public static class TikTokWebViewHelper
         {
             webView.Settings.UserAgentString = GetDefaultUserAgent();
         }
+
+        // Fix layout viewport and scaling
+        webView.Settings.UseWideViewPort = true;
+        webView.Settings.LoadWithOverviewMode = true;
+        webView.Settings.BuiltInZoomControls = true;
+        webView.Settings.DisplayZoomControls = false;
+        webView.Settings.SetSupportZoom(true);
         
         // Enable cookies (critical for TikTok session)
         var cookieManager = Android.Webkit.CookieManager.Instance;
