@@ -165,6 +165,11 @@ public static class StreakScheduler
         if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
         {
             var intent = new Intent(Settings.ActionRequestScheduleExactAlarm);
+            var packageName = context.PackageName;
+            if (!string.IsNullOrEmpty(packageName))
+            {
+                intent.SetData(global::Android.Net.Uri.Parse($"package:{packageName}"));
+            }
             intent.SetFlags(ActivityFlags.NewTask);
             context.StartActivity(intent);
         }

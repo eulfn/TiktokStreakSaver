@@ -22,6 +22,32 @@ namespace TiktokStreakSaver
             
             // Request notification permission for Android 13+
             RequestNotificationPermission();
+
+            // Configure dynamic native status bar
+            if (Application.Current != null)
+            {
+                Application.Current.RequestedThemeChanged += (s, e) => UpdateStatusBar(e.RequestedTheme);
+                UpdateStatusBar(Application.Current.RequestedTheme);
+            }
+        }
+
+        private void UpdateStatusBar(AppTheme? theme)
+        {
+            if (Window == null) return;
+            var windowInsetsController = AndroidX.Core.View.WindowCompat.GetInsetsController(Window, Window.DecorView);
+            if (windowInsetsController != null)
+            {
+                if (theme == AppTheme.Dark)
+                {
+                    Window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#121212"));
+                    windowInsetsController.AppearanceLightStatusBars = false; // Light icons on dark background
+                }
+                else
+                {
+                    Window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#F2F2F2"));
+                    windowInsetsController.AppearanceLightStatusBars = true;  // Dark icons on light background
+                }
+            }
         }
 
         private void CreateNotificationChannel()

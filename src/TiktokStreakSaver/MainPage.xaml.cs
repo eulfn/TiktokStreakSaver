@@ -29,6 +29,9 @@ public partial class MainPage : ContentPage
         
         // Check session status
         CheckSessionStatus();
+
+        // Update permissions UI state
+        _ = CheckPermissionsState();
     }
 
     private void CheckSessionStatus()
@@ -99,6 +102,48 @@ public partial class MainPage : ContentPage
         }
     }
 #endif
+
+    private async Task CheckPermissionsState()
+    {
+#if ANDROID
+        var context = Platform.CurrentActivity ?? Android.App.Application.Context;
+        
+        bool hasBatteryExemption = TiktokStreakSaver.Platforms.Android.StreakScheduler.IsIgnoringBatteryOptimizations(context);
+        bool hasExactAlarm = TiktokStreakSaver.Platforms.Android.StreakScheduler.CanScheduleExactAlarms(context);
+        bool hasNotification = true;
+        
+        if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Tiramisu)
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.PostNotifications>();
+            hasNotification = status == PermissionStatus.Granted;
+        }
+
+        bool allGranted = hasBatteryExemption && hasExactAlarm && hasNotification;
+        
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            if (allGranted)
+            {
+                ConfigButton.IsVisible = false;
+                Grid.SetColumn(RunNowButton, 0);
+                Grid.SetColumnSpan(RunNowButton, 2);
+            }
+            else
+            {
+                ConfigButton.IsVisible = true;
+                Grid.SetColumn(RunNowButton, 1);
+                Grid.SetColumnSpan(RunNowButton, 1);
+            }
+        });
+#else
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            ConfigButton.IsVisible = false;
+            Grid.SetColumn(RunNowButton, 0);
+            Grid.SetColumnSpan(RunNowButton, 2);
+        });
+#endif
+    }
 
     private void OnSessionCheckNavigated(object? sender, WebNavigatedEventArgs e)
     {
