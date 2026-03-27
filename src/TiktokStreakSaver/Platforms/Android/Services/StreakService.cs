@@ -287,11 +287,6 @@ public class StreakService : Service
 
     private void ProcessNextFriend()
     {
-        if (_runResult is not null && !string.IsNullOrEmpty(_runResult.ErrorMessage))
-        {
-            CompleteService(false, $"Previous run failed: {_runResult.ErrorMessage}");
-            return;
-        }
         if (_friendsToProcess == null || _currentFriendIndex >= _friendsToProcess.Count)
         {
             // All friends processed
