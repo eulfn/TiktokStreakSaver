@@ -309,13 +309,13 @@ public class StreakService : Service
         var js = GetFriendMessageScript(friend.Username, message);
         _webView?.EvaluateJavascript(js, null);
 
-        // Failsafe timeout mechanism
+        // Failsafe timeout mechanism - increased to 120s as TikTok chat lists can be long
         _mainHandler?.PostDelayed(() => {
-            if (_currentlyProcessingUsername == friend.Username)
+            if (_currentlyProcessingUsername != null && _currentlyProcessingUsername.Equals(friend.Username, StringComparison.OrdinalIgnoreCase))
             {
                 OnMessageResult(friend.Username, false, "Chat timeout or not found");
             }
-        }, 30000);
+        }, 120000);
     }
 
     private string GetFriendMessageScript(string username, string message)
@@ -333,7 +333,7 @@ public class StreakService : Service
 
     internal void OnMessageResult(string username, bool success, string error)
     {
-        if (username != _currentlyProcessingUsername) return; // Prevent duplicate callbacks from delayed JS or duplicate messages
+        if (_currentlyProcessingUsername == null || !username.Equals(_currentlyProcessingUsername, StringComparison.OrdinalIgnoreCase)) return; // Prevent duplicate callbacks from delayed JS or duplicate messages
         _currentlyProcessingUsername = null; // Mark as processed
 
         if (_friendsToProcess == null || _settingsService == null) return;
