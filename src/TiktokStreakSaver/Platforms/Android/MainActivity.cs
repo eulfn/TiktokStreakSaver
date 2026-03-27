@@ -33,6 +33,7 @@ namespace TiktokStreakSaver
 
         private void UpdateStatusBar(AppTheme? theme)
         {
+#pragma warning disable CA1422 // Validate platform compatibility
             if (Window == null) return;
             var windowInsetsController = AndroidX.Core.View.WindowCompat.GetInsetsController(Window, Window.DecorView);
             if (windowInsetsController != null)
@@ -48,6 +49,7 @@ namespace TiktokStreakSaver
                     windowInsetsController.AppearanceLightStatusBars = true;  // Dark icons on light background
                 }
             }
+#pragma warning restore CA1422
         }
 
         private void CreateNotificationChannel()

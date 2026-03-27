@@ -19,7 +19,7 @@ public class AlarmReceiver : BroadcastReceiver
             // Start the foreground service
             var serviceIntent = new Intent(context, typeof(StreakService));
             
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            if (OperatingSystem.IsAndroidVersionAtLeast(26))
             {
                 context.StartForegroundService(serviceIntent);
             }

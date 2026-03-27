@@ -68,7 +68,7 @@ public class StreakService : Service
         {
             var notification = CreateNotification("Preparing to send streaks...");
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Q)
+            if (OperatingSystem.IsAndroidVersionAtLeast(29))
             {
                 // Android 10+ requires specifying the foreground service type
                 StartForeground(NotificationId, notification, ForegroundService.TypeDataSync);
@@ -110,7 +110,7 @@ public class StreakService : Service
 
     private void CreateNotificationChannel()
     {
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+        if (OperatingSystem.IsAndroidVersionAtLeast(26))
         {
             var notificationManager = (NotificationManager?)GetSystemService(NotificationService);
             if (notificationManager == null) return;
