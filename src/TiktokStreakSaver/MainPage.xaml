@@ -20,7 +20,7 @@
                        TextColor="{StaticResource Gray500}"/>
             </VerticalStackLayout>
 
-            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}" />
+            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
 
             <!-- Status Section -->
             <VerticalStackLayout Spacing="16">
@@ -48,7 +48,7 @@
                 </Grid>
             </VerticalStackLayout>
 
-            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}" />
+            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
 
             <!-- Primary Actions -->
             <VerticalStackLayout Spacing="12">
@@ -95,7 +95,7 @@
 
             <WebView x:Name="SessionCheckWebView" HeightRequest="0" WidthRequest="0" IsVisible="False" Navigated="OnSessionCheckNavigated"/>
 
-            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}" />
+            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
 
             <!-- Configuration -->
             <VerticalStackLayout Spacing="12">
@@ -113,7 +113,7 @@
                 </Border>
             </VerticalStackLayout>
 
-            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}" />
+            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
 
             <!-- Friends List -->
             <VerticalStackLayout Spacing="16">
@@ -184,7 +184,7 @@
                 </VerticalStackLayout>
             </VerticalStackLayout>
 
-            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}" />
+            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
 
             <!-- Run History -->
             <VerticalStackLayout Spacing="16">
