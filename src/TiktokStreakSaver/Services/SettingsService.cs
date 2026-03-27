@@ -25,7 +25,7 @@ public class SettingsService
     /// <summary>
     /// Default message to send
     /// </summary>
-    public const string DefaultMessage = "Hey! Keeping our streak alive! 🔥";
+    public const string DefaultMessage = "streak";
 
     /// <summary>
     /// Default interval in hours
